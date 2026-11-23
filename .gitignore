@@ -1,0 +1,22 @@
+# Android binaries and bundles (must be hosted via GitHub Releases assets, never in git)
+*.apk
+*.aab
+
+# Keystores and private signing credentials
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+signing.properties
+key.properties
+
+# Build artifacts and temporary files
+build/
+dist/
+*.tmp
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db

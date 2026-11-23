@@ -1,0 +1,23 @@
+{
+  "applicationId": "com.example.offlink",
+  "name": "Offlink",
+  "summary": "Offline-first, privacy-focused peer-to-peer messaging over Bluetooth Low Energy.",
+  "description": "Offlink is designed for serverless, private communication using Bluetooth Low Energy and ad-hoc multi-hop mesh networking. It functions without internet connectivity, cellular networks, SIM cards, or central servers.",
+  "categories": [
+    "Communication",
+    "Security",
+    "Peer-to-Peer",
+    "Mesh Networking"
+  ],
+  "minSdkVersion": 24,
+  "targetSdkVersion": 36,
+  "compileSdkVersion": 36,
+  "supportedAbis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "sourceRepository": "https://github.com/Omkar-git-hub/offlink",
+  "releasesRepository": "https://github.com/Omkar-git-hub/offlink-releases",
+  "issueTracker": "https://github.com/Omkar-git-hub/offlink/issues"
+}
