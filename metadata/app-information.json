@@ -1,5 +1,5 @@
 {
-  "applicationId": "com.example.offlink",
+  "applicationId": "io.github.omkar_git_hub.offlink",
   "name": "Offlink",
   "summary": "Offline-first, privacy-focused peer-to-peer messaging over Bluetooth Low Energy.",
   "description": "Offlink is designed for serverless, private communication using Bluetooth Low Energy and ad-hoc multi-hop mesh networking. It functions without internet connectivity, cellular networks, SIM cards, or central servers.",

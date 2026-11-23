@@ -1,21 +1,19 @@
 {
   "latestRelease": {
-    "version": "0.1.0-alpha.1",
-    "versionCode": 1,
-    "tag": "v0.1.0-alpha.1",
+    "version": "0.1.0-alpha.4",
+    "versionCode": 4,
+    "tag": "v0.1.0-alpha.4",
     "releaseDate": "2026-11-23",
     "channel": "alpha",
     "preRelease": true,
-    "apkFileName": "Offlink-0.1.0-alpha.1.apk",
-    "fileSize": 60031181,
-    "sha256": "e10a26c0fdc8907f50ad59cbff51ca02994506250067484e8b59ccf2ef4239e7",
-    "downloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/download/v0.1.0-alpha.1/Offlink-0.1.0-alpha.1.apk",
+    "apkFileName": "Offlink-0.1.0-alpha.4.apk",
+    "fileSize": 59035837,
+    "sha256": "d463d567764b6c67d5e20a1d88269e02285dad78c80cf2c48647b0a2144d5186",
+    "downloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/download/v0.1.0-alpha.4/Offlink-0.1.0-alpha.4.apk",
     "signingCertificate": {
-      "type": "Android Debug (Development/Alpha Keystore)",
-      "commonName": "CN=Android Debug, O=Android, C=US",
-      "sha256": "df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df",
-      "sha1": "1a4551631d083108a5b34aebd6102e947882652c",
-      "signatureScheme": "v2"
+      "type": "Android Production Keystore",
+      "signatureScheme": "v2",
+      "sha256": "df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df"
     }
   }
 }

@@ -20,6 +20,7 @@ Offlink utilizes three progressive release channels to balance rapid iteration w
 
 | Version | Release Date | Channel | Git Tag | Target SDK | Min SDK | SHA-256 Checksum | Release Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **v0.1.0-alpha.4** | 2026-11-23 | Alpha | [`v0.1.0-alpha.4`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.4) | API 36 | API 24 | `d463d567764b...` | [Notes](CHANGELOG.md#010-alpha4) |
 | **v0.1.0-alpha.1** | 2026-11-23 | Alpha | [`v0.1.0-alpha.1`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.1) | API 36 | API 24 | `e10a26c0fdc8...` | [Notes](CHANGELOG.md#010-alpha1---2026-11-23) |
 
 ---
