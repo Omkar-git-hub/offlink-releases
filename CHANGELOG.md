@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-alpha.5] - 2026-11-24
+
+### Added
+- **Dual-Asset Distribution Flow**: Automated publishing of both canonical versioned binaries (`Offlink-0.1.0-alpha.5.apk`) and unversioned stable aliases (`Offlink.apk`) with verified dual-entry SHA-256 manifests.
+- **Direct Download Architecture**: Full support for stable latest download endpoints (`/releases/latest/download/Offlink.apk`) resolving without 404.
+- **Leak-Proof Deployment Authentication**: Hardened distribution synchronization to utilize HTTP Authorization extraheaders, preventing token exposure in command arguments or remote URLs.
+- **Automated Distribution Maintenance**: Target distribution updates directly to `main` with fail-closed security.
+
+### Release Notes
+- GitHub Release: [`v0.1.0-alpha.5`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.5)
+- Direct Download: [Offlink.apk](https://github.com/Omkar-git-hub/offlink-releases/releases/latest/download/Offlink.apk)
+- Target SDK: 36 (Android 16), Minimum SDK: 24 (Android 7.0)
+
+---
+
 ## [0.1.0-alpha.4] - 2026-11-23
 
 ### Security Hardening
