@@ -1,73 +1,68 @@
-# Security Policy & APK Verification — Offlink
+# Security Policy & Vulnerability Disclosure — Offlink
 
-Security and privacy are fundamental pillars of the Offlink project. This document describes how users and researchers can verify official Offlink releases, validate cryptographic identities, and report security vulnerabilities responsibly.
+Security and privacy are foundational principles of the Offlink project. We are committed to maintaining the highest standards of cryptographic integrity, protocol robustness, and user privacy.
 
----
-
-## Identifying Official Releases
-
-To protect yourself against modified or malicious builds, only download Offlink from official channels:
-
-- **Official Release Repository**: [https://github.com/Omkar-git-hub/offlink-releases](https://github.com/Omkar-git-hub/offlink-releases)
-- **Source Code Repository**: [https://github.com/Omkar-git-hub/offlink](https://github.com/Omkar-git-hub/offlink)
-
-Never download Offlink APK binaries from third-party mirrors, unauthorized file sharing websites, or unverified download portals.
+This document describes how to report security vulnerabilities responsibly and how official release authenticity is safeguarded.
 
 ---
 
-## Cryptographic Checksums
+## 1. Reporting a Security Vulnerability
 
-Every official release includes a corresponding `SHA256SUMS.txt` file containing the SHA-256 cryptographic hashes of all distributed assets.
+We welcome security audits, cryptographic reviews, and vulnerability reports from independent researchers, developers, and the open-source community.
 
-### Verified Hashes for Release `v0.1.0-alpha.1`
+> [!CAUTION]
+> **DO NOT REPORT SECURITY VULNERABILITIES VIA PUBLIC ISSUES**
+> Never open a public GitHub issue, discussion thread, or pull request detailing an unpatched vulnerability, cryptographic weakness, or exploitable bug. Public disclosure before a fix is published puts users at risk.
 
-| Asset | SHA-256 Digest |
-| :--- | :--- |
-| `Offlink-0.1.0-alpha.1.apk` | `e10a26c0fdc8907f50ad59cbff51ca02994506250067484e8b59ccf2ef4239e7` |
-| `SHA256SUMS.txt` | `4ca2c8cf02572a85dd06379c448843d9f9f5d230286e062e571b2e8477b51a20` |
+### Private Reporting Channels
 
+Please submit vulnerability disclosures through one of the following confidential channels:
 
----
+1. **GitHub Security Advisory (Preferred)**:
+   Submit a private advisory draft on the main source repository:
+   👉 **[Report a Security Advisory Privately](https://github.com/Omkar-git-hub/offlink/security/advisories/new)**
 
-## Signing Identity & Certificate Transparency
-
-### Current Alpha Release (`v0.1.0-alpha.1`)
-For the initial pre-release and architecture verification stage, builds are signed with the development/alpha signing identity:
-
-- **Signer Common Name**: `CN=Android Debug, O=Android, C=US`
-- **Certificate SHA-256 Digest**: `df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df`
-- **Certificate SHA-1 Digest**: `1a4551631d083108a5b34aebd6102e947882652c`
-- **Certificate MD5 Digest**: `bff99f89f7b16564b3e1dd1b6acb0b1d`
-- **Signature Scheme**: APK Signature Scheme v2
-
-### Verifying Certificate on Your Machine
-Using the Android SDK `apksigner` tool:
-```bash
-apksigner verify --print-certs Offlink-0.1.0-alpha.1.apk
-```
-Confirm that the certificate SHA-256 digest matches `df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df`.
-
-### Transition to Permanent Official Release Key
-As outlined in [docs/distribution/release-policy.md](docs/distribution/release-policy.md), Offlink will introduce an air-gapped, permanent official release signing keystore with the launch of the automated Continuous Deployment (CD) pipeline. When upgrading from this alpha build to that release, Android OS signature enforcement will require an initial uninstall and clean reinstall.
-
----
-
-## Reporting a Vulnerability
-
-We welcome security audits and vulnerability reports from researchers and the open-source community.
-
-If you discover a security vulnerability, flaw in our cryptographic implementation, or privacy issue:
-
-1. **Do not create a public issue**.
-2. Submit a private vulnerability report via **GitHub Security Advisories**:
-   👉 [Report a Security Advisory on GitHub](https://github.com/Omkar-git-hub/offlink/security/advisories/new)
-3. If GitHub Advisories is inaccessible, open a confidential issue labeled `security` on the main source repository:
-   👉 [https://github.com/Omkar-git-hub/offlink/issues](https://github.com/Omkar-git-hub/offlink/issues)
+2. **Distribution Repository Advisory**:
+   If the vulnerability pertains to release distribution, packaging, or checksums:
+   👉 **[Report a Distribution Security Advisory](https://github.com/Omkar-git-hub/offlink-releases/security/advisories/new)**
 
 ### What to Include in Your Report
-- A detailed description of the vulnerability.
-- Steps to reproduce the issue or proof-of-concept code.
-- Affected components (e.g. packet router, crypto handshake, local database).
+To help us triage and remediate the issue quickly, include:
+- A descriptive summary of the vulnerability.
+- Affected components (e.g. BLE GATT transport, X25519 key exchange, ChaCha20-Poly1305 encryption, mesh router, SQLite database, Android manifest).
+- Step-by-step reproduction instructions or a minimal proof-of-concept (PoC).
 - Potential impact on user confidentiality, message integrity, or network availability.
+- Suggested remediation or patch (if available).
 
-We aim to acknowledge reports within 48 hours and work with you on timely disclosure.
+### Response & Coordinated Disclosure Timeline
+- **Initial Acknowledgment**: Within 48 hours of receipt.
+- **Triage & Assessment**: Within 7 business days, including confirmation of severity and affected versions.
+- **Remediation & Patching**: Fixes are developed privately on an encrypted branch or advisory workspace.
+- **Public Disclosure**: Coordinated release with a GitHub Security Advisory and patched release binaries within an agreed disclosure window (typically 30–90 days, or immediately upon patch availability).
+
+---
+
+## 2. Supported Versions
+
+Security updates and patches are provided for the following release streams:
+
+| Release Stream | Status | Security Support |
+| :--- | :--- | :--- |
+| **Latest Release / Tag** | Active | ✅ Fully supported with prioritized patches |
+| **Previous Alpha Pre-Releases** | Deprecated | ❌ Upgrades required; users must migrate to the latest release |
+
+---
+
+## 3. Official Release Verification & Supply Chain Security
+
+To protect against modified binaries, supply chain attacks, and malicious clones:
+
+1. **Official Distribution Channel Only**:
+   Download Offlink APK binaries exclusively from the official distribution repository:
+   👉 **[https://github.com/Omkar-git-hub/offlink-releases/releases](https://github.com/Omkar-git-hub/offlink-releases/releases)**
+2. **File Integrity Verification**:
+   Always verify the SHA-256 digest of downloaded binaries against the official `SHA256SUMS.txt` manifest included with each GitHub Release.
+3. **Cryptographic Signature Verification**:
+   Verify the digital signature of the APK using `apksigner` to ensure the package was signed by the authentic Offlink release identity and has not been tampered with.
+
+For comprehensive verification commands and signature inspection procedures, see the **[APK Verification Guide](docs/verification/apk-verification.md)**.

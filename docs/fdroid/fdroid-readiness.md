@@ -9,10 +9,11 @@ This document evaluates the current readiness of the Offlink Android application
 - **Current Status**: **In Preparation (Not Yet Submitted)**
 - **Target Channel**: F-Droid Main Repository
 - **Compatibility Score**: **High (No proprietary blobs, fully open-source dependencies)**
-- **Action Required Before Submission**: Select official open-source license (e.g. GPL-3.0 / AGPL-3.0 / Apache-2.0), establish permanent release package ID and signing identity, and publish Fastlane metadata structure.
+- **Package Identifier**: `io.github.omkar_git_hub.offlink`
+- **Action Required Before Submission**: Finalize official open-source license text file (e.g. Apache-2.0 / GPL-3.0) in source repo, transition to permanent production signing key, and publish Fastlane metadata structure.
 
 > [!WARNING]
-> Offlink is **NOT** currently published on F-Droid. Do not claim F-Droid availability until the upstream review and build recipe are accepted by the F-Droid team.
+> Offlink is **NOT** currently published on F-Droid. Do not claim F-Droid availability until the upstream review and build recipe are formally accepted by the F-Droid team.
 
 ---
 
@@ -55,7 +56,7 @@ F-Droid builds all applications from source on headless Debian Linux build serve
   ```
 - No proprietary build steps or custom IDE plugins are required.
 
-### F-Droid Metadata Recipe Draft (`metadata/com.example.offlink.yml` or future package ID)
+### F-Droid Metadata Recipe Draft (`metadata/io.github.omkar_git_hub.offlink.yml`)
 ```yaml
 Categories:
   - Security
@@ -72,9 +73,9 @@ Description: |-
   Offlink operates without internet, cellular data, or central servers.
 
 Builds:
-  - versionName: 0.1.0-alpha.1
-    versionCode: 1
-    commit: v0.1.0-alpha.1
+  - versionName: 0.1.0-alpha.4
+    versionCode: 4
+    commit: v0.1.0-alpha.4
     subdir: offlink
     output: build/app/outputs/flutter-apk/app-release.apk
     flutter: yes
@@ -108,7 +109,8 @@ It is vital to understand the architectural difference between GitHub Releases a
 - [x] Independent of Google Play Services.
 - [x] Builds cleanly via standard `flutter` and `gradle` CLI.
 - [x] Verified minimum SDK (24) and target SDK (36).
-- [ ] Finalize official open-source license in `offlink` repository.
-- [ ] Rename package ID from `com.example.offlink` to production ID (e.g. `io.github.omkar_git_hub.offlink` or `org.offlink.app`).
+- [x] Package ID configured as `io.github.omkar_git_hub.offlink` in source Gradle configuration.
+- [ ] Finalize official open-source license file in `offlink` repository.
+- [ ] Transition from testing keystore to permanent production signing key.
 - [ ] Prepare Fastlane metadata structure (`fastlane/metadata/android/en-US/`).
 - [ ] Submit merge request to `fdroiddata` repository once stable v1.0.0 is reached.

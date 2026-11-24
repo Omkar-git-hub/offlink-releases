@@ -1,89 +1,151 @@
 # APK Verification Guide — Offlink
 
-This document explains how to independently verify the cryptographic integrity, authentic checksums, package metadata, and signing certificate of downloaded Offlink Android Application Packages (APKs).
+This document provides step-by-step instructions for independently verifying the cryptographic integrity, authenticity, and signing certificates of official Offlink Android Application Packages (APKs).
 
 ---
 
-## 1. SHA-256 Checksum Verification
+## 1. Understanding Integrity vs. Developer Identity
 
-Validating the SHA-256 checksum ensures the file was downloaded completely without corruption, network truncation, or tampering.
+Before verifying binaries, it is essential to understand the difference between **file integrity** and **cryptographic identity**:
 
-### Official Values for `v0.1.0-alpha.1`
-
-| File | SHA-256 Digest |
-| :--- | :--- |
-| `Offlink-0.1.0-alpha.1.apk` | `e10a26c0fdc8907f50ad59cbff51ca02994506250067484e8b59ccf2ef4239e7` |
-| `SHA256SUMS.txt` | `321b0fc2dd8e078ea0ba6b7185ee66657c79db151c8db1a34b22db74087b21ec` |
-
----
-
-### Verification Commands
-
-#### Linux
-```bash
-sha256sum -c SHA256SUMS.txt
-# Expected output:
-# Offlink-0.1.0-alpha.1.apk: OK
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        APK VERIFICATION LAYERS                         │
+├───────────────────────────────────┬────────────────────────────────────┤
+│ 1. File Integrity (SHA-256)       │ 2. Developer Identity (apksigner)   │
+├───────────────────────────────────┼────────────────────────────────────┤
+│ • Validates download completeness │ • Proves who signed the binary     │
+│ • Detects truncation or bit rot   │ • Proves code was not modified     │
+│ • Compares with SHA256SUMS.txt    │   since signing by developer key   │
+│ • Does NOT prove origin identity  │ • Protects against forged releases │
+└───────────────────────────────────┴────────────────────────────────────┘
 ```
 
-Or calculate manually:
+> [!WARNING]
+> **A SHA-256 Checksum Does NOT Prove Developer Identity**:
+> A checksum only confirms that the file on your device is byte-for-byte identical to the file referenced in `SHA256SUMS.txt`. If an attacker were to compromise a hosting server, they could alter both the APK and the `SHA256SUMS.txt` file simultaneously.
+>
+> True origin authentication requires verifying the **cryptographic signature** embedded within the APK itself using tools such as `apksigner`.
+
+---
+
+## 2. Step 1: File Integrity Verification (SHA-256)
+
+### Where to Obtain Checksum Files
+Every official release published on [GitHub Releases](https://github.com/Omkar-git-hub/offlink-releases/releases) includes an accompanying `SHA256SUMS.txt` asset containing the official build digests.
+
+### Verification Commands by Operating System
+
+#### Windows (PowerShell)
+Open PowerShell in the folder containing your downloaded APK and run:
+```powershell
+Get-FileHash -Path .\Offlink-*.apk -Algorithm SHA256
+```
+
+#### Linux
+Open a terminal in the download folder and verify against `SHA256SUMS.txt`:
 ```bash
-sha256sum Offlink-0.1.0-alpha.1.apk
+sha256sum -c SHA256SUMS.txt
+```
+Or compute manually:
+```bash
+sha256sum Offlink-*.apk
 ```
 
 #### macOS
 ```bash
-shasum -a 256 Offlink-0.1.0-alpha.1.apk
+shasum -a 256 Offlink-*.apk
 ```
 
-#### Windows (PowerShell)
-```powershell
-Get-FileHash -Path .\Offlink-0.1.0-alpha.1.apk -Algorithm SHA256
-```
-
-#### Android (Termux)
+#### Android (via Termux)
 ```bash
-sha256sum Offlink-0.1.0-alpha.1.apk
+sha256sum Offlink-*.apk
 ```
+
+### Interpreting SHA-256 Results
+- **Hashes Match**: The APK was downloaded completely without byte corruption or transit errors.
+- **Hashes Differ**: **DO NOT INSTALL.** The download was either interrupted, corrupted, or altered. Delete the file and re-download from the official Releases page.
 
 ---
 
-## 2. APK Signature Verification (`apksigner`)
+## 3. Step 2: APK Signature Verification (`apksigner`)
 
-To verify that the APK binary is properly signed and conforms to Android's APK Signature Scheme:
+Android APKs are signed with cryptographic certificates according to the Android APK Signature Scheme (v2, v3, or v4). Using the official Android SDK tool `apksigner`, you can verify that:
+1. The binary's signature is cryptographically valid and untampered.
+2. The signing certificate matches the expected developer identity.
 
-### Command
+`apksigner` is included in the Android SDK Build-Tools (e.g. `build-tools/<version>/apksigner`).
+
+### Signature Verification Command
 ```bash
-apksigner verify --verbose --print-certs Offlink-0.1.0-alpha.1.apk
+apksigner verify --verbose --print-certs Offlink-<version>.apk
 ```
 
-### Expected Output
+### Understanding the Output
+
+A valid signature output will report:
 ```text
 Verifies
 Verified using v1 scheme (JAR signing): false
 Verified using v2 scheme (APK Signature Scheme v2): true
 Verified using v3 scheme (APK Signature Scheme v3): false
 Number of signers: 1
-
-Signer #1 certificate DN: C=US, O=Android, CN=Android Debug
-Signer #1 certificate SHA-256 digest: df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df
-Signer #1 certificate SHA-1 digest: 1a4551631d083108a5b34aebd6102e947882652c
-Signer #1 certificate MD5 digest: bff99f89f7b16564b3e1dd1b6acb0b1d
+Signer #1 certificate DN: ...
+Signer #1 certificate SHA-256 digest: ...
 ```
+
+Key indicators:
+- **`Verifies`**: Confirms that the cryptographic signature covers all archive contents and the archive has not been modified since it was signed.
+- **`Verified using v2 scheme: true`**: Confirms valid Android Signature Scheme v2 enforcement.
+- **`Signer #1 certificate SHA-256 digest`**: The cryptographic fingerprint of the public key certificate used to sign the APK.
 
 ---
 
-## 3. Package & Manifest Verification (`aapt`)
+## 4. Signing Identities & Release Stages
 
-You can inspect the compiled Android Manifest, package name, version, and requested permissions directly from the binary:
+### Alpha Testing Phase
+Initial pre-releases (such as developer Alpha builds) are signed with a development/testing signing identity (`CN=Android Debug`) to facilitate early hardware testing and protocol validation:
+- **Signer DN**: `CN=Android Debug, O=Android, C=US`
+- **Certificate SHA-256**: `df03904dbb6579c665a55f39c53472056048495c004422f0add2153924de06df`
+
+### Official Production Release Phase
+Official production builds are signed with a dedicated release keystore managed through secure, fail-closed CI/CD pipelines.
+
+> [!IMPORTANT]
+> **Android Signature Enforcement**:
+> Android OS enforces that app upgrades must match the certificate of the installed version. When transitioning from an Alpha testing build to an official production release, Android will reject an in-place upgrade (`INSTALL_FAILED_UPDATE_INCOMPATIBLE`). Users must uninstall the testing build before installing the production release.
+
+---
+
+## 5. Step 3: Package & Manifest Inspection (`aapt2`)
+
+To inspect compiled package metadata, Android SDK targets, and declared permissions:
 
 ```bash
-aapt dump badging Offlink-0.1.0-alpha.1.apk
+aapt2 dump badging Offlink-<version>.apk
 ```
 
-### Expected Verification Metrics
-- `package: name='com.example.offlink' versionCode='1' versionName='0.1.0-alpha.1'`
-- `sdkVersion:'24'` (Android 7.0)
-- `targetSdkVersion:'36'` (Android 16)
-- `native-code: 'arm64-v8a' 'armeabi-v7a' 'x86_64'`
-- Permissions: Only BLE, foreground service, wake lock, post notifications, and coarse/fine location.
+### Verified Baseline Attributes
+- **Package Name**: `io.github.omkar_git_hub.offlink`
+- **Minimum SDK**: `24` (Android 7.0)
+- **Target SDK**: `36` (Android 16)
+- **Native Architectures**: `arm64-v8a`, `armeabi-v7a`, `x86_64`
+- **Permissions Requested**:
+  - `BLUETOOTH`, `BLUETOOTH_ADMIN` (legacy)
+  - `BLUETOOTH_SCAN`, `BLUETOOTH_ADVERTISE`, `BLUETOOTH_CONNECT` (Android 12+)
+  - `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`
+  - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_CONNECTED_DEVICE`
+  - `POST_NOTIFICATIONS`, `WAKE_LOCK`
+
+Any official APK should **NEVER** request permissions for internet (`android.permission.INTERNET`), phone state, contacts, or external storage.
+
+---
+
+## 6. Interpreting Verification Failures
+
+| Failure Symptom | Likely Cause | Required Action |
+| :--- | :--- | :--- |
+| **`sha256sum: FAILED`** | Incomplete download or truncated file. | Delete the file, clear browser cache, and re-download from GitHub Releases. |
+| **`DOES NOT VERIFY` from `apksigner`** | The APK archive was modified or corrupted after signing. | **Do not install.** Discard the file immediately. |
+| **Unexpected Certificate Digest** | APK was re-signed with an unauthorized or unknown certificate. | **Do not install.** Verify download source. Ensure the APK was retrieved directly from `Omkar-git-hub/offlink-releases`. |
+| **`INSTALL_FAILED_UPDATE_INCOMPATIBLE`** | An APK signed with a different key is already installed on device. | Uninstall the previous build from your phone and perform a clean install. |

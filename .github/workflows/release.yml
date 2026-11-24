@@ -1,0 +1,276 @@
+name: Offlink Distribution Release Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (without leading "v", e.g. 0.1.0-alpha.5)'
+        required: true
+        type: string
+      source_ref:
+        description: 'Git ref in Omkar-git-hub/offlink to build from (tag, branch, or commit SHA)'
+        required: true
+        default: 'main'
+        type: string
+      prerelease:
+        description: 'Mark this release as a pre-release'
+        required: true
+        default: true
+        type: boolean
+      draft:
+        description: 'Create this release as an unpublished draft'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: release-distribution
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: Build, Verify & Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate Release Inputs
+        id: validate_inputs
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          VERSION="$INPUT_VERSION"
+          echo "Validating version format: $VERSION"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.-]+)?$ ]]; then
+            echo "::error::Invalid version string '$VERSION'. Must follow Semantic Versioning (e.g. 0.1.0-alpha.5)."
+            exit 1
+          fi
+
+          TAG="v${VERSION}"
+          echo "Release tag will be: $TAG"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Check for Duplicate Release
+        id: check_duplicate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.validate_inputs.outputs.tag }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists in Omkar-git-hub/offlink-releases. Aborting to prevent accidental overwrite."
+            exit 1
+          fi
+          echo "Release $TAG does not exist yet. Safe to proceed."
+
+      - name: Check Signing Credentials (Fail-Closed)
+        id: check_credentials
+        env:
+          KEYSTORE_BASE64: ${{ secrets.OFFLINK_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.OFFLINK_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.OFFLINK_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.OFFLINK_KEY_PASSWORD }}
+        run: |
+          MISSING=()
+          if [ -z "$KEYSTORE_BASE64" ]; then MISSING+=("OFFLINK_KEYSTORE_BASE64"); fi
+          if [ -z "$KEYSTORE_PASS" ]; then MISSING+=("OFFLINK_KEYSTORE_PASSWORD"); fi
+          if [ -z "$KEY_ALIAS" ]; then MISSING+=("OFFLINK_KEY_ALIAS"); fi
+          if [ -z "$KEY_PASS" ]; then MISSING+=("OFFLINK_KEY_PASSWORD"); fi
+
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "::error::FAIL-CLOSED: Required release signing credentials are missing in repository secrets: ${MISSING[*]}."
+            echo "::error::Official production releases require valid signing secrets. Publication aborted."
+            exit 1
+          fi
+
+          KEYSTORE_FILE="${{ runner.temp }}/release.jks"
+          echo "$KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_FILE"
+          chmod 600 "$KEYSTORE_FILE"
+          echo "OFFLINK_KEYSTORE_PATH=$KEYSTORE_FILE" >> $GITHUB_ENV
+          echo "OFFLINK_KEYSTORE_PASSWORD=$KEYSTORE_PASS" >> $GITHUB_ENV
+          echo "OFFLINK_KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
+          echo "OFFLINK_KEY_PASSWORD=$KEY_PASS" >> $GITHUB_ENV
+          echo "Keystore securely staged in runner temp."
+
+      - name: Checkout Source Repository (Read-Only)
+        uses: actions/checkout@v4
+        with:
+          repository: 'Omkar-git-hub/offlink'
+          ref: ${{ inputs.source_ref }}
+          path: 'offlink-source'
+          fetch-depth: 0
+
+      - name: Record Source Commit Information
+        id: source_info
+        run: |
+          cd offlink-source
+          SOURCE_SHA=$(git rev-parse HEAD)
+          SOURCE_SUBJECT=$(git log -1 --pretty=%s)
+          echo "Source Commit SHA: $SOURCE_SHA"
+          echo "Source Subject   : $SOURCE_SUBJECT"
+          echo "sha=$SOURCE_SHA" >> $GITHUB_OUTPUT
+          echo "subject=$SOURCE_SUBJECT" >> $GITHUB_OUTPUT
+          cd ..
+
+      - name: Set up Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Show Build Environment
+        run: |
+          java -version
+          flutter --version
+
+      - name: Install Source Dependencies
+        run: |
+          cd offlink-source
+          flutter pub get
+          cd ..
+
+      - name: Build Android Release APK
+        env:
+          VERSION: ${{ steps.validate_inputs.outputs.version }}
+        run: |
+          cd offlink-source
+          flutter build apk --release \
+            --build-name="$VERSION" \
+            --android-skip-build-dependency-validation
+          cd ..
+
+      - name: Validate & Prepare Release Artifacts
+        id: prepare_artifacts
+        env:
+          VERSION: ${{ steps.validate_inputs.outputs.version }}
+          TAG: ${{ steps.validate_inputs.outputs.tag }}
+        run: |
+          SOURCE_APK="offlink-source/build/app/outputs/flutter-apk/app-release.apk"
+
+          if [ ! -f "$SOURCE_APK" ]; then
+            echo "::error::Built APK not found at $SOURCE_APK."
+            exit 1
+          fi
+
+          mkdir -p release-staging
+          TARGET_APK="release-staging/Offlink-${VERSION}.apk"
+          cp "$SOURCE_APK" "$TARGET_APK"
+
+          # Verify APK with apksigner if available
+          if command -v apksigner >/dev/null 2>&1; then
+            echo "Verifying APK with apksigner..."
+            apksigner verify --verbose --print-certs "$TARGET_APK"
+          elif [ -n "$ANDROID_HOME" ] && [ -d "$ANDROID_HOME/build-tools" ]; then
+            LATEST_BUILD_TOOLS=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+            if [ -x "$LATEST_BUILD_TOOLS/apksigner" ]; then
+              echo "Verifying APK using $LATEST_BUILD_TOOLS/apksigner..."
+              "$LATEST_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$TARGET_APK"
+            fi
+          fi
+
+          # Generate SHA-256 Checksum Manifest
+          cd release-staging
+          sha256sum "Offlink-${VERSION}.apk" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          APK_SHA=$(awk '{print $1}' SHA256SUMS.txt)
+          APK_SIZE=$(stat -c%s "Offlink-${VERSION}.apk" 2>/dev/null || stat -f%z "Offlink-${VERSION}.apk")
+          echo "apk_sha=$APK_SHA" >> $GITHUB_OUTPUT
+          echo "apk_size=$APK_SIZE" >> $GITHUB_OUTPUT
+          cd ..
+
+      - name: Generate Release Notes
+        id: notes
+        env:
+          VERSION: ${{ steps.validate_inputs.outputs.version }}
+          TAG: ${{ steps.validate_inputs.outputs.tag }}
+          SOURCE_SHA: ${{ steps.source_info.outputs.sha }}
+          SOURCE_SUBJ: ${{ steps.source_info.outputs.subject }}
+          APK_SHA: ${{ steps.prepare_artifacts.outputs.apk_sha }}
+          APK_SIZE: ${{ steps.prepare_artifacts.outputs.apk_size }}
+          IS_PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          CLASSIFICATION="Official Stable Release"
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            CLASSIFICATION="Developer Alpha (Pre-Release)"
+          fi
+
+          cat << EOF > RELEASE_NOTES.md
+# Offlink ${TAG}
+
+**Release Classification**: ${CLASSIFICATION}
+**Release Date**: $(date -u +'%Y-%m-%d')
+**Source Repository**: [Omkar-git-hub/offlink](https://github.com/Omkar-git-hub/offlink)
+**Source Commit**: [${SOURCE_SHA}](https://github.com/Omkar-git-hub/offlink/commit/${SOURCE_SHA})
+**Commit Message**: ${SOURCE_SUBJ}
+
+---
+
+## Compatibility & Platform Requirements
+- **Minimum Android**: Android 7.0 Nougat (API Level 24)
+- **Target Android**: Android 16 (API Level 36)
+- **Supported ABIs**: \`arm64-v8a\`, \`armeabi-v7a\`, \`x86_64\`
+- **Bluetooth Requirement**: BLE 4.2+ with Peripheral Advertising support
+
+---
+
+## Cryptographic Checksums & Assets
+
+| Asset | File Size | SHA-256 Checksum |
+| :--- | :--- | :--- |
+| \`Offlink-${VERSION}.apk\` | ${APK_SIZE} bytes | \`${APK_SHA}\` |
+| \`SHA256SUMS.txt\` | Manifest | Included in release |
+
+### Verify Checksum
+\`\`\`bash
+sha256sum -c SHA256SUMS.txt
+\`\`\`
+
+---
+
+## Documentation & Guides
+- **[Installation Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/INSTALL.md)**
+- **[APK Verification Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/verification/apk-verification.md)**
+- **[Troubleshooting Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/installation/troubleshooting.md)**
+- **[Security Policy](https://github.com/Omkar-git-hub/offlink-releases/blob/main/SECURITY.md)**
+EOF
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.validate_inputs.outputs.tag }}
+          VERSION: ${{ steps.validate_inputs.outputs.version }}
+          IS_PRERELEASE: ${{ inputs.prerelease }}
+          IS_DRAFT: ${{ inputs.draft }}
+        run: |
+          FLAGS=()
+          if [ "$IS_PRERELEASE" = "true" ]; then
+            FLAGS+=("--prerelease")
+          fi
+          if [ "$IS_DRAFT" = "true" ]; then
+            FLAGS+=("--draft")
+          fi
+
+          echo "Publishing GitHub Release $TAG..."
+          gh release create "$TAG" \
+            "${FLAGS[@]}" \
+            --title "Offlink $TAG" \
+            --notes-file RELEASE_NOTES.md \
+            release-staging/Offlink-${VERSION}.apk \
+            release-staging/SHA256SUMS.txt
+
+          echo "Release $TAG successfully published to Omkar-git-hub/offlink-releases."
+
+      - name: Clean Up Keystore
+        if: always()
+        run: |
+          rm -f "${{ runner.temp }}/release.jks" "$OFFLINK_KEYSTORE_PATH" 2>/dev/null || true
+          echo "Temporary keystore file securely destroyed."

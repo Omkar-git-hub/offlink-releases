@@ -7,26 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-# Offlink v0.1.0-alpha.4
+## [0.1.0-alpha.4] - 2026-11-23
 
-**Release Classification**: Developer Alpha (Pre-Release)
-**Release Date**: 2026-11-23
-**Source Repository**: https://github.com/Omkar-git-hub/offlink
-**Android Compatibility**: Android 7.0 Nougat (API 24) to Android 16 (API 36)
-**Supported Architectures**: `arm64-v8a`, `armeabi-v7a`, `x86_64`
+### Security Hardening
+- **Enforce Fail-Closed Release Signing**: Configured Gradle release build tasks to fail-closed if required signing credentials (`OFFLINK_KEYSTORE_PATH`, `OFFLINK_KEYSTORE_PASSWORD`, `OFFLINK_KEY_ALIAS`, `OFFLINK_KEY_PASSWORD`) are missing or invalid, preventing silent fallback to debug signing.
+- **Package Identity Alignment**: Aligned namespace and application ID configuration to `io.github.omkar_git_hub.offlink`.
 
----
-
-### 🔒 Security Hardening
-- fix(security): enforce fail-closed release signing configuration
+### Release Notes
+- GitHub Release: [`v0.1.0-alpha.4`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.4)
+- Target SDK: 36 (Android 16), Minimum SDK: 24 (Android 7.0)
 
 ---
-
-## Verification & Security
-- Checksums are available in `SHA256SUMS.txt`.
-- For signature and hash verification instructions, visit [APK Verification Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/verification/apk-verification.md).
-- To report security issues responsibly, please see [Security Policy](https://github.com/Omkar-git-hub/offlink-releases/blob/main/SECURITY.md).
-
 
 ## [0.1.0-alpha.1] - 2026-11-23
 
