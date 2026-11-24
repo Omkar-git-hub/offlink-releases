@@ -25,6 +25,8 @@ Offlink utilizes three progressive release tiers:
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **v0.1.0-alpha.5** | 2026-11-24 | Alpha (Latest) | [`v0.1.0-alpha.5`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.5) | API 36 | API 24 | `3608c6a2f754...` | [Notes](CHANGELOG.md#010-alpha5---2026-11-24) |
 | **v0.1.0-alpha.4** | 2026-11-23 | Alpha | [`v0.1.0-alpha.4`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.4) | API 36 | API 24 | `d463d567764b...` | [Notes](CHANGELOG.md#010-alpha4---2026-11-23) |
+| **v0.1.0-alpha.3** | 2026-11-23 | Alpha | [`v0.1.0-alpha.3`](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.3) | API 36 | API 24 | `4dcbbd368e2a...` | [Notes](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.3) |
+| **v0.1.0-alpha.2** | 2026-11-23 | Alpha | [`v0.1.0-alpha.2`](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.2) | API 36 | API 24 | `76f87178584b...` | [Notes](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.2) |
 | **v0.1.0-alpha.1** | 2026-11-23 | Alpha | [`v0.1.0-alpha.1`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.1) | API 36 | API 24 | `e10a26c0fdc8...` | [Notes](CHANGELOG.md#010-alpha1---2026-11-23) |
 
 ---
