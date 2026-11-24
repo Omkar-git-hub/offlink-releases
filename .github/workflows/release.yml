@@ -203,45 +203,47 @@ jobs:
             CLASSIFICATION="Developer Alpha (Pre-Release)"
           fi
 
-          cat << EOF > RELEASE_NOTES.md
-# Offlink ${TAG}
+          RELEASE_DATE=$(date -u +'%Y-%m-%d')
 
-**Release Classification**: ${CLASSIFICATION}
-**Release Date**: $(date -u +'%Y-%m-%d')
-**Source Repository**: [Omkar-git-hub/offlink](https://github.com/Omkar-git-hub/offlink)
-**Source Commit**: [${SOURCE_SHA}](https://github.com/Omkar-git-hub/offlink/commit/${SOURCE_SHA})
-**Commit Message**: ${SOURCE_SUBJ}
-
----
-
-## Compatibility & Platform Requirements
-- **Minimum Android**: Android 7.0 Nougat (API Level 24)
-- **Target Android**: Android 16 (API Level 36)
-- **Supported ABIs**: \`arm64-v8a\`, \`armeabi-v7a\`, \`x86_64\`
-- **Bluetooth Requirement**: BLE 4.2+ with Peripheral Advertising support
-
----
-
-## Cryptographic Checksums & Assets
-
-| Asset | File Size | SHA-256 Checksum |
-| :--- | :--- | :--- |
-| \`Offlink-${VERSION}.apk\` | ${APK_SIZE} bytes | \`${APK_SHA}\` |
-| \`SHA256SUMS.txt\` | Manifest | Included in release |
-
-### Verify Checksum
-\`\`\`bash
-sha256sum -c SHA256SUMS.txt
-\`\`\`
-
----
-
-## Documentation & Guides
-- **[Installation Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/INSTALL.md)**
-- **[APK Verification Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/verification/apk-verification.md)**
-- **[Troubleshooting Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/installation/troubleshooting.md)**
-- **[Security Policy](https://github.com/Omkar-git-hub/offlink-releases/blob/main/SECURITY.md)**
-EOF
+          {
+            echo "# Offlink ${TAG}"
+            echo ""
+            echo "**Release Classification**: ${CLASSIFICATION}"
+            echo "**Release Date**: ${RELEASE_DATE}"
+            echo "**Source Repository**: [Omkar-git-hub/offlink](https://github.com/Omkar-git-hub/offlink)"
+            echo "**Source Commit**: [${SOURCE_SHA}](https://github.com/Omkar-git-hub/offlink/commit/${SOURCE_SHA})"
+            echo "**Commit Message**: ${SOURCE_SUBJ}"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Compatibility & Platform Requirements"
+            echo "- **Minimum Android**: Android 7.0 Nougat (API Level 24)"
+            echo "- **Target Android**: Android 16 (API Level 36)"
+            echo "- **Supported ABIs**: \`arm64-v8a\`, \`armeabi-v7a\`, \`x86_64\`"
+            echo "- **Bluetooth Requirement**: BLE 4.2+ with Peripheral Advertising support"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Cryptographic Checksums & Assets"
+            echo ""
+            echo "| Asset | File Size | SHA-256 Checksum |"
+            echo "| :--- | :--- | :--- |"
+            echo "| \`Offlink-${VERSION}.apk\` | ${APK_SIZE} bytes | \`${APK_SHA}\` |"
+            echo "| \`SHA256SUMS.txt\` | Manifest | Included in release |"
+            echo ""
+            echo "### Verify Checksum"
+            echo '```bash'
+            echo "sha256sum -c SHA256SUMS.txt"
+            echo '```'
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Documentation & Guides"
+            echo "- **[Installation Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/INSTALL.md)**"
+            echo "- **[APK Verification Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/verification/apk-verification.md)**"
+            echo "- **[Troubleshooting Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/installation/troubleshooting.md)**"
+            echo "- **[Security Policy](https://github.com/Omkar-git-hub/offlink-releases/blob/main/SECURITY.md)**"
+          } > RELEASE_NOTES.md
 
       - name: Publish GitHub Release
         env:
