@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+# Offlink v0.1.0-alpha.6
+
+**Release Classification**: Developer Alpha (Pre-Release)
+**Release Date**: 2026-11-24
+**Source Repository**: https://github.com/Omkar-git-hub/offlink
+**Android Compatibility**: Android 7.0 Nougat (API 24) to Android 16 (API 36)
+**Supported Architectures**: `arm64-v8a`, `armeabi-v7a`, `x86_64`
+
+---
+
+### 🚀 Features & Enhancements
+- feat(release): align distribution pipeline to target main branch exclusively (f0f6aa0)
+
+---
+
+## Verification & Security
+- Checksums are available in `SHA256SUMS.txt`.
+- For signature and hash verification instructions, visit [APK Verification Guide](https://github.com/Omkar-git-hub/offlink-releases/blob/main/docs/verification/apk-verification.md).
+- To report security issues responsibly, please see [Security Policy](https://github.com/Omkar-git-hub/offlink-releases/blob/main/SECURITY.md).
+
+
 ## [0.1.0-alpha.5] - 2026-11-24
 
 ### Added

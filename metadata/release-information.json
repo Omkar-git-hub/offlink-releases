@@ -1,16 +1,16 @@
 {
   "latestRelease": {
-    "version": "0.1.0-alpha.5",
-    "versionCode": 5,
-    "tag": "v0.1.0-alpha.5",
+    "version": "0.1.0-alpha.6",
+    "versionCode": 6,
+    "tag": "v0.1.0-alpha.6",
     "releaseDate": "2026-11-24",
     "channel": "alpha",
     "preRelease": true,
-    "apkFileName": "Offlink-0.1.0-alpha.5.apk",
+    "apkFileName": "Offlink-0.1.0-alpha.6.apk",
     "stableApkFileName": "Offlink.apk",
     "fileSize": 59035837,
-    "sha256": "3608c6a2f754003c94ed8bdebf2db7230a6851ae03070f6ac2c2e587fcfd6b32",
-    "downloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/download/v0.1.0-alpha.5/Offlink-0.1.0-alpha.5.apk",
+    "sha256": "baf6a0db6374bf5eb5d5ad37f59eac942676a82458d22c17ed488f7ad5700ffc",
+    "downloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/download/v0.1.0-alpha.6/Offlink-0.1.0-alpha.6.apk",
     "stableDownloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/latest/download/Offlink.apk",
     "signingCertificate": {
       "type": "Android Production Keystore",

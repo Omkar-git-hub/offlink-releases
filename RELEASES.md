@@ -23,6 +23,7 @@ Offlink utilizes three progressive release tiers:
 
 | Version | Release Date | Channel | Git Tag | Target SDK | Min SDK | SHA-256 Checksum (APK) | Release Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **v0.1.0-alpha.6** | 2026-11-24 | Alpha | [`v0.1.0-alpha.6`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.6) | API 36 | API 24 | `baf6a0db6374...` | [Notes](CHANGELOG.md#010-alpha6) |
 | **v0.1.0-alpha.5** | 2026-11-24 | Alpha (Latest) | [`v0.1.0-alpha.5`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.5) | API 36 | API 24 | `3608c6a2f754...` | [Notes](CHANGELOG.md#010-alpha5---2026-11-24) |
 | **v0.1.0-alpha.4** | 2026-11-23 | Alpha | [`v0.1.0-alpha.4`](https://github.com/Omkar-git-hub/offlink-releases/releases/tag/v0.1.0-alpha.4) | API 36 | API 24 | `d463d567764b...` | [Notes](CHANGELOG.md#010-alpha4---2026-11-23) |
 | **v0.1.0-alpha.3** | 2026-11-23 | Alpha | [`v0.1.0-alpha.3`](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.3) | API 36 | API 24 | `4dcbbd368e2a...` | [Notes](https://github.com/Omkar-git-hub/offlink/releases/tag/v0.1.0-alpha.3) |
