@@ -7,9 +7,11 @@
     "channel": "alpha",
     "preRelease": true,
     "apkFileName": "Offlink-0.1.0-alpha.4.apk",
+    "stableApkFileName": "Offlink.apk",
     "fileSize": 59035837,
     "sha256": "d463d567764b6c67d5e20a1d88269e02285dad78c80cf2c48647b0a2144d5186",
     "downloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/download/v0.1.0-alpha.4/Offlink-0.1.0-alpha.4.apk",
+    "stableDownloadUrl": "https://github.com/Omkar-git-hub/offlink-releases/releases/latest/download/Offlink.apk",
     "signingCertificate": {
       "type": "Android Production Keystore",
       "signatureScheme": "v2",

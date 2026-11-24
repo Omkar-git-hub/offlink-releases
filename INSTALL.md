@@ -16,13 +16,15 @@ This guide provides instructions for downloading, verifying, installing, and con
 
 ## Step 1: Download the Official Release Assets
 
-Always download Offlink APK binaries exclusively from the official GitHub Releases page:
+You can download Offlink directly or browse all published versions:
 
-👉 **[Official Offlink Releases](https://github.com/Omkar-git-hub/offlink-releases/releases)**
+- 🚀 **[Download Latest Offlink APK](https://github.com/Omkar-git-hub/offlink-releases/releases/latest/download/Offlink.apk)**: Direct download of the latest release (`Offlink.apk`).
+- 📦 **[Browse All Official Releases](https://github.com/Omkar-git-hub/offlink-releases/releases)**: Browse all releases, historical builds, and release notes.
 
-On the Releases page, locate your desired release and download both assets:
-1. **`Offlink-<version>.apk`**: The compiled Android application package (e.g., `Offlink-0.1.0-alpha.4.apk`).
-2. **`SHA256SUMS.txt`**: The checksum manifest containing the official build hash.
+Each release provides:
+1. **`Offlink.apk`**: Direct download alias for the latest version.
+2. **`Offlink-<version>.apk`**: The compiled canonical Android application package (e.g., `Offlink-0.1.0-alpha.4.apk`).
+3. **`SHA256SUMS.txt`**: The checksum manifest containing the official build hash.
 
 ---
 

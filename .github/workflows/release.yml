@@ -17,6 +17,11 @@ on:
         required: true
         default: true
         type: boolean
+      set_latest:
+        description: 'Set as latest release (enables /releases/latest/download/Offlink.apk)'
+        required: false
+        default: true
+        type: boolean
       draft:
         description: 'Create this release as an unpublished draft'
         required: false
@@ -164,6 +169,7 @@ jobs:
           mkdir -p release-staging
           TARGET_APK="release-staging/Offlink-${VERSION}.apk"
           cp "$SOURCE_APK" "$TARGET_APK"
+          cp "$SOURCE_APK" "release-staging/Offlink.apk"
 
           # Verify APK with apksigner if available
           if command -v apksigner >/dev/null 2>&1; then
@@ -177,11 +183,11 @@ jobs:
             fi
           fi
 
-          # Generate SHA-256 Checksum Manifest
+          # Generate SHA-256 Checksum Manifest (Dual Asset)
           cd release-staging
-          sha256sum "Offlink-${VERSION}.apk" > SHA256SUMS.txt
+          sha256sum "Offlink-${VERSION}.apk" "Offlink.apk" > SHA256SUMS.txt
           cat SHA256SUMS.txt
-          APK_SHA=$(awk '{print $1}' SHA256SUMS.txt)
+          APK_SHA=$(awk 'NR==1 {print $1}' SHA256SUMS.txt)
           APK_SIZE=$(stat -c%s "Offlink-${VERSION}.apk" 2>/dev/null || stat -f%z "Offlink-${VERSION}.apk")
           echo "apk_sha=$APK_SHA" >> $GITHUB_OUTPUT
           echo "apk_size=$APK_SIZE" >> $GITHUB_OUTPUT
@@ -226,10 +232,11 @@ jobs:
             echo ""
             echo "## Cryptographic Checksums & Assets"
             echo ""
-            echo "| Asset | File Size | SHA-256 Checksum |"
-            echo "| :--- | :--- | :--- |"
-            echo "| \`Offlink-${VERSION}.apk\` | ${APK_SIZE} bytes | \`${APK_SHA}\` |"
-            echo "| \`SHA256SUMS.txt\` | Manifest | Included in release |"
+            echo "| Asset | Description | File Size | SHA-256 Checksum |"
+            echo "| :--- | :--- | :--- | :--- |"
+            echo "| \`Offlink-${VERSION}.apk\` | Canonical versioned release binary | ${APK_SIZE} bytes | \`${APK_SHA}\` |"
+            echo "| \`Offlink.apk\` | Direct stable latest download alias | ${APK_SIZE} bytes | \`${APK_SHA}\` |"
+            echo "| \`SHA256SUMS.txt\` | Cryptographic SHA-256 checksum manifest | Manifest | Included in release |"
             echo ""
             echo "### Verify Checksum"
             echo '```bash'
@@ -251,10 +258,13 @@ jobs:
           TAG: ${{ steps.validate_inputs.outputs.tag }}
           VERSION: ${{ steps.validate_inputs.outputs.version }}
           IS_PRERELEASE: ${{ inputs.prerelease }}
+          SET_LATEST: ${{ inputs.set_latest }}
           IS_DRAFT: ${{ inputs.draft }}
         run: |
           FLAGS=()
-          if [ "$IS_PRERELEASE" = "true" ]; then
+          if [ "$SET_LATEST" = "true" ]; then
+            FLAGS+=("--latest")
+          elif [ "$IS_PRERELEASE" = "true" ]; then
             FLAGS+=("--prerelease")
           fi
           if [ "$IS_DRAFT" = "true" ]; then
@@ -267,6 +277,7 @@ jobs:
             --title "Offlink $TAG" \
             --notes-file RELEASE_NOTES.md \
             release-staging/Offlink-${VERSION}.apk \
+            release-staging/Offlink.apk \
             release-staging/SHA256SUMS.txt
 
           echo "Release $TAG successfully published to Omkar-git-hub/offlink-releases."
